@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Misiones de Europa – Caramelos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #003399;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .game {
+            background: rgba(0, 0, 60, 0.85);
+            padding: 20px;
+            border-radius: 12px;
+            width: 380px;
+            text-align: center;
+        }
+
+        img {
+            width: 220px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 3px solid #ffcc00;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border: none;
+            border-radius: 8px;
+            background: #ffcc00;
+            color: #003399;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #ffd633;
+        }
+
+        .correct {
+            background: #4caf50 !important;
+            color: white;
+        }
+
+        .incorrect {
+            background: #e53935 !important;
+            color: white;
+        }
+
+        #next {
+            margin-top: 10px;
+            display: none;
+        }
+
+        #letters button {
+            margin: 4px;
+            padding: 8px;
+            width: 40px;
+        }
+
+        #answerBox {
+            background: white;
+            color: black;
+            padding: 8px;
+            border-radius: 6px;
+            min-height: 25px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game">
+    <h2 id="title">Misiones de Europa</h2>
+    <p id="description">Completa las misiones y gana caramelos 🍬</p>
+
+    <div id="content"></div>
+
+    <button id="next" class="btn">Siguiente misión</button>
+
+    <p id="score"></p>
+</div>
+
+<script>
+    let mission = 0;
+    let candies = 0;
+
+    const title = document.getElementById("title");
+    const description = document.getElementById("description");
+    const content = document.getElementById("content");
+    const nextBtn = document.getElementById("next");
+    const scoreText = document.getElementById("score");
+
+    function updateScore() {
+        scoreText.textContent = `Caramelos: ${candies} 🍬`;
+    }
+
+    function loadMission() {
+        nextBtn.style.display = "none";
+        content.innerHTML = "";
+
+        updateScore();
+
+        if (mission === 0) {
+            title.textContent = "Misión 1: Adivina la bandera";
+            description.textContent = "¿De qué país es esta bandera?";
+            loadFlagMission();
+        }
+
+        else if (mission === 1) {
+            title.textContent = "Misión 2: Adivina la capital";
+            description.textContent = "Selecciona la capital correcta";
+            loadCapitalMission();
+        }
+
+        else if (mission === 2) {
+            title.textContent = "Misión 3: Forma el país";
+            description.textContent = "Ordena las letras para formar el país";
+            loadLettersMission();
+        }
+
+        else if (mission === 3) {
+            title.textContent = "Misión 4: Pregunta rápida";
+            description.textContent = "Responde correctamente";
+            loadQuizMission();
+        }
+
+        else if (mission === 4) {
+            title.textContent = "Misión 5: Encuentra el país";
+            description.textContent = "Haz clic en la imagen correcta";
+            loadImageMission();
+        }
+
+        else {
+            title.textContent = "¡Juego completado!";
+            description.textContent = `Has ganado ${candies} caramelos 🍬`;
+            content.innerHTML = "";
+            nextBtn.style.display = "none";
+        }
+    }
+
+    // -------------------------
+    // MISIÓN 1: BANDERAS
+    // -------------------------
+    function loadFlagMission() {
+        const flag = {
+            country: "Italia",
+            img: "https://flagcdn.com/w320/it.png",
+            options: ["Hungría", "Italia", "Irlanda", "Bulgaria"]
+        };
+
+        const img = document.createElement("img");
+        img.src = flag.img;
+        content.appendChild(img);
+
+        flag.options.forEach(option => {
+            const btn = document.createElement("button");
+            btn.textContent = option;
+            btn.className = "btn";
+            btn.onclick = () => checkAnswer(btn, option, flag.country);
+            content.appendChild(btn);
+        });
+    }
+
+    // -------------------------
+    // MISIÓN 2: CAPITALES
+    // -------------------------
+    function loadCapitalMission() {
+        const q = {
+            country: "Alemania",
+            capital: "Berlín",
+            options: ["Viena", "Berlín", "Praga", "Varsovia"]
+        };
+
+        const p = document.createElement("p");
+        p.textContent = `¿Cuál es la capital de ${q.country}?`;
+        content.appendChild(p);
+
+        q.options.forEach(option => {
+            const btn = document.createElement("button");
+            btn.textContent = option;
+            btn.className = "btn";
+            btn.onclick = () => checkAnswer(btn, option, q.capital);
+            content.appendChild(btn);
+        });
+    }
+
+    // -------------------------
+    // MISIÓN 3: LETRAS
+    // -------------------------
+    function loadLettersMission() {
+        const word = "FRANCIA";
+        const letters = word.split("").sort(() => Math.random() - 0.5);
+
+        const answerBox = document.createElement("div");
+        answerBox.id = "answerBox";
+        content.appendChild(answerBox);
+
+        const lettersDiv = document.createElement("div");
+        lettersDiv.id = "letters";
+        content.appendChild(lettersDiv);
+
+        letters.forEach(letter => {
+            const btn = document.createElement("button");
+            btn.textContent = letter;
+            btn.className = "btn";
+            btn.onclick = () => {
+                answerBox.textContent += letter;
+                btn.disabled = true;
+
+                if (answerBox.textContent === word) {
+                    candies++;
+                    updateScore();
+                    nextBtn.style.display = "block";
+                }
+            };
+            lettersDiv.appendChild(btn);
+        });
+    }
+
+    // -------------------------
+    // MISIÓN 4: QUIZ
+    // -------------------------
+    function loadQuizMission() {
+        const q = {
+            question: "¿Cuántas estrellas tiene la bandera de la Unión Europea?",
+            correct: "12",
+            options: ["10", "12", "15", "20"]
+        };
+
+        const p = document.createElement("p");
+        p.textContent = q.question;
+        content.appendChild(p);
+
+        q.options.forEach(option => {
+            const btn = document.createElement("button");
+            btn.textContent = option;
+            btn.className = "btn";
+            btn.onclick = () => checkAnswer(btn, option, q.correct);
+            content.appendChild(btn);
+        });
+    }
+
+    // -------------------------
+    // MISIÓN 5: IMÁGENES
+    // -------------------------
+    function loadImageMission() {
+        const q = {
+            correct: "España",
+            images: [
+                { country: "España", img: "https://flagcdn.com/w320/es.png" },
+                { country: "Suecia", img: "https://flagcdn.com/w320/se.png" },
+                { country: "Francia", img: "https://flagcdn.com/w320/fr.png" }
+            ]
+        };
+
+        q.images.forEach(item => {
+            const img = document.createElement("img");
+            img.src = item.img;
+            img.style.cursor = "pointer";
+            img.onclick = () => checkAnswer(img, item.country, q.correct);
+            content.appendChild(img);
+        });
+    }
+
+    // -------------------------
+    // COMPROBAR RESPUESTA
+    // -------------------------
+    function checkAnswer(element, selected, correct) {
+        const buttons = content.querySelectorAll("button, img");
+
+        buttons.forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            element.classList.add("correct");
+            candies++;
+        } else {
+            element.classList.add("incorrect");
+        }
+
+        updateScore();
+        nextBtn.style.display = "block";
+    }
+
+    nextBtn.onclick = () => {
+        mission++;
+        loadMission();
+    };
+
+    loadMission();
+</script>
+
+</body>
+</html>
